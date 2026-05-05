@@ -25,6 +25,41 @@ def validate_single_face(faces):
         "multipleFaces": bool(multiple_faces)
     }
 
+def validate_face_position_and_size(faces, image_shape):
+    if len(faces) != 1:
+        return {
+            "centered": False,
+            "faceSizeOk": False
+        }
+
+    (x, y, w, h) = faces[0]
+
+    img_h, img_w = image_shape[:2]
+
+    # --- centro do rosto ---
+    face_center_x = x + w / 2
+    face_center_y = y + h / 2
+
+    img_center_x = img_w / 2
+    img_center_y = img_h / 2
+
+    # --- tolerância (15%) ---
+    tolerance_x = img_w * 0.15
+    tolerance_y = img_h * 0.15
+
+    centered = (
+        abs(face_center_x - img_center_x) < tolerance_x and
+        abs(face_center_y - img_center_y) < tolerance_y
+    )
+
+    # --- tamanho do rosto ---
+    face_ratio = h / img_h
+    face_size_ok = 0.5 <= face_ratio <= 0.8
+
+    return {
+        "centered": bool(centered),
+        "faceSizeOk": bool(face_size_ok)
+    }
 
 async def analyze_image(file):
     with tempfile.NamedTemporaryFile(delete=False) as temp:
@@ -48,11 +83,15 @@ async def analyze_image(file):
     faces = detect_faces(gray)
     face_validation = validate_single_face(faces)
 
+    position_validation = validate_face_position_and_size(faces, img.shape)
+
     approved = (
         sharpness > 100 and
         brightness > 50 and
         face_validation["faceDetected"] and
-        not face_validation["multipleFaces"]
+        not face_validation["multipleFaces"] and
+        position_validation["centered"] and
+        position_validation["faceSizeOk"]
     )
 
     return {
@@ -60,5 +99,7 @@ async def analyze_image(file):
         "brightness": float(brightness),
         "faceDetected": face_validation["faceDetected"],
         "multipleFaces": face_validation["multipleFaces"],
+        "centered": bool(position_validation["centered"]),
+        "faceSizeOk": bool(position_validation["faceSizeOk"]),
         "approved": bool(approved)
     }
