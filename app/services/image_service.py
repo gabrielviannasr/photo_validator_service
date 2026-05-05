@@ -1,6 +1,12 @@
 import cv2
 import numpy as np
 import tempfile
+from app.core.config import (
+    FACE_CENTER_TOLERANCE_X,
+    FACE_CENTER_TOLERANCE_Y,
+    FACE_SIZE_MIN_RATIO,
+    FACE_SIZE_MAX_RATIO
+)
 
 def detect_faces(gray_image):
     face_cascade = cv2.CascadeClassifier(
@@ -44,8 +50,8 @@ def validate_face_position_and_size(faces, image_shape):
     img_center_y = img_h / 2
 
     # --- tolerância (15%) ---
-    tolerance_x = img_w * 0.15
-    tolerance_y = img_h * 0.15
+    tolerance_x = img_w * FACE_CENTER_TOLERANCE_X
+    tolerance_y = img_h * FACE_CENTER_TOLERANCE_Y
 
     centered = (
         abs(face_center_x - img_center_x) < tolerance_x and
@@ -54,7 +60,7 @@ def validate_face_position_and_size(faces, image_shape):
 
     # --- tamanho do rosto ---
     face_ratio = h / img_h
-    face_size_ok = 0.5 <= face_ratio <= 0.8
+    face_size_ok = FACE_SIZE_MIN_RATIO <= face_ratio <= FACE_SIZE_MAX_RATIO
 
     return {
         "centered": bool(centered),
