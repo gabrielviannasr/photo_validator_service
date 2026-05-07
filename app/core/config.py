@@ -14,6 +14,9 @@ CENTER_SCORE_NORMALIZER = 0.30
 # FACE SIZE VALIDATION
 # ==========================================
 
+# Divisor usado no score contínuo de tamanho
+FACE_RATIO_NORMALIZER = 0.50
+
 # Faixa aceita para proporção do rosto
 FACE_SIZE_MIN_RATIO = 0.50
 FACE_SIZE_MAX_RATIO = 0.85
@@ -21,18 +24,14 @@ FACE_SIZE_MAX_RATIO = 0.85
 # Proporção ideal do rosto na imagem
 IDEAL_FACE_RATIO = 0.65
 
-# Divisor usado no score contínuo de tamanho
-FACE_RATIO_NORMALIZER = 0.50
-
 
 # ==========================================
 # IMAGE QUALITY
 # ==========================================
 
-MAX_SHARPNESS = 500
-
 IDEAL_BRIGHTNESS = 140
 MAX_BRIGHTNESS_DIFFERENCE = 140
+MAX_SHARPNESS = 500
 
 
 # ==========================================
@@ -46,20 +45,20 @@ MAX_EYE_ALIGNMENT_DIFFERENCE = 0.05
 # SCORE WEIGHTS
 # ==========================================
 
-SHARPNESS_WEIGHT = 0.20
 BRIGHTNESS_WEIGHT = 0.15
-FACE_WEIGHT = 0.25
-
 CENTER_WEIGHT = 0.15
+FACE_WEIGHT = 0.25
 FACE_SIZE_WEIGHT = 0.05
 HEAD_POSE_WEIGHT = 0.20
+SHARPNESS_WEIGHT = 0.20
 
 
 # ==========================================
 # FINAL VALIDATION
 # ==========================================
 
-VALIDATION_SCORE_THRESHOLD = 0.80
-
 # Limite máximo usado na normalização contínua
 MAX_NORMALIZED_SCORE = 1.0
+
+# Nota mínima para aprovação da foto
+VALIDATION_SCORE_THRESHOLD = 0.80
