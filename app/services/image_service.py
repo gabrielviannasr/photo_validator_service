@@ -13,6 +13,9 @@ from app.services.validators.face_landmarks_validator import (
 from app.services.validators.head_pose_validator import (
     validate_head_straight
 )
+from app.services.validators.score_validator import (
+    calculate_validation_score
+)
 
 def detect_faces(gray_image):
     face_cascade = cv2.CascadeClassifier(
@@ -103,15 +106,25 @@ async def analyze_image(file):
 
     position_validation = validate_face_position_and_size(faces, img.shape)
 
-    approved = (
-        sharpness > 100 and
-        brightness > 50 and
-        face_validation["faceDetected"] and
-        not face_validation["multipleFaces"] and
-        position_validation["centered"] and
-        position_validation["faceSizeOk"] and
-        head_pose_validation["headStraight"]
+    validation_score = calculate_validation_score(
+        sharpness,
+        brightness,
+        face_validation,
+        position_validation,
+        head_pose_validation
     )
+
+    # approved = (
+    #     sharpness > 100 and
+    #     brightness > 50 and
+    #     face_validation["faceDetected"] and
+    #     not face_validation["multipleFaces"] and
+    #     position_validation["centered"] and
+    #     position_validation["faceSizeOk"] and
+    #     head_pose_validation["headStraight"]
+    # )
+
+    approved = validation_score >= 0.80
 
     return {
         "landmarksDetected": landmarks is not None,
@@ -123,5 +136,6 @@ async def analyze_image(file):
         "faceSizeOk": bool(position_validation["faceSizeOk"]),
         "headStraight": head_pose_validation["headStraight"],
         "eyeAlignmentDifference": head_pose_validation["eyeAlignmentDifference"],
+        "validationScore": float(validation_score),
         "approved": bool(approved)
     }
