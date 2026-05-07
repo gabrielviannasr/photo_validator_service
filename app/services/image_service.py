@@ -5,7 +5,8 @@ from app.core.config import (
     FACE_CENTER_TOLERANCE_X,
     FACE_CENTER_TOLERANCE_Y,
     FACE_SIZE_MIN_RATIO,
-    FACE_SIZE_MAX_RATIO
+    FACE_SIZE_MAX_RATIO,
+    VALIDATION_SCORE_THRESHOLD
 )
 from app.services.validators.face_landmarks_validator import (
     detect_face_landmarks
@@ -127,7 +128,7 @@ async def analyze_image(file):
     #     head_pose_validation["headStraight"]
     # )
 
-    approved = validation_score["validationScore"] >= 0.80
+    approved = validation_score["validationScore"] >= VALIDATION_SCORE_THRESHOLD
 
     return {
         "landmarksDetected": landmarks is not None,

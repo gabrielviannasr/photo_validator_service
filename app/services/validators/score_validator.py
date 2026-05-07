@@ -1,7 +1,4 @@
 from app.core.config import (
-    FACE_CENTER_TOLERANCE_X,
-    FACE_CENTER_TOLERANCE_Y,
-
     MAX_SHARPNESS,
     IDEAL_BRIGHTNESS,
     MAX_BRIGHTNESS_DIFFERENCE,
@@ -9,9 +6,18 @@ from app.core.config import (
 
     SHARPNESS_WEIGHT,
     BRIGHTNESS_WEIGHT,
-    FACE_WEIGHT
-)
+    FACE_WEIGHT,
 
+    CENTER_WEIGHT,
+    FACE_SIZE_WEIGHT,
+    HEAD_POSE_WEIGHT,
+
+    CENTER_SCORE_NORMALIZER,
+    IDEAL_FACE_RATIO,
+    FACE_RATIO_NORMALIZER,
+
+    MAX_NORMALIZED_SCORE
+)
 
 def calculate_validation_score(
     sharpness,
@@ -31,7 +37,10 @@ def calculate_validation_score(
 
     # --- nitidez contínua ---
     sharpness_score = (
-        min(sharpness / MAX_SHARPNESS, 1.0)
+        min(
+            sharpness / MAX_SHARPNESS,
+            MAX_NORMALIZED_SCORE
+        )
         * SHARPNESS_WEIGHT
     )
 
@@ -65,20 +74,35 @@ def calculate_validation_score(
     )
 
     center_score = (
-        max(0, 1 - (center_distance /  0.30)) * 0.15
+        max(
+            0,
+            1 - (
+                center_distance
+                / CENTER_SCORE_NORMALIZER
+            )
+        )
+        * CENTER_WEIGHT
     )
 
     score += center_score
 
     # --- tamanho do rosto ---
-    ideal_face_ratio = 0.65
+    ideal_face_ratio = IDEAL_FACE_RATIO
 
     face_ratio_difference = abs(
-        position_validation["faceRatio"] - ideal_face_ratio
+        position_validation["faceRatio"]
+        - IDEAL_FACE_RATIO
     )
 
     face_size_score = (
-        max(0, 1 - (face_ratio_difference / 0.50)) * 0.10
+        max(
+            0,
+            1 - (
+                face_ratio_difference
+                / FACE_RATIO_NORMALIZER
+            )
+        )
+        * FACE_SIZE_WEIGHT
     )
 
     score += face_size_score
@@ -89,7 +113,14 @@ def calculate_validation_score(
     )
 
     head_pose_score = (
-        max(0, 1 - (eye_alignment_difference / MAX_EYE_ALIGNMENT_DIFFERENCE)) * 0.10
+        max(
+            0,
+            1 - (
+                eye_alignment_difference
+                / MAX_EYE_ALIGNMENT_DIFFERENCE
+            )
+        )
+        * HEAD_POSE_WEIGHT
     )
 
     score += head_pose_score
