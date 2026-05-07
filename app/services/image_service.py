@@ -10,6 +10,9 @@ from app.core.config import (
 from app.services.validators.face_landmarks_validator import (
     detect_face_landmarks
 )
+from app.services.validators.head_pose_validator import (
+    validate_head_straight
+)
 
 def detect_faces(gray_image):
     face_cascade = cv2.CascadeClassifier(
@@ -85,6 +88,9 @@ async def analyze_image(file):
     # identifica pontos de referência facial (olhos, nariz, boca, etc.)
     landmarks = detect_face_landmarks(img)
 
+    # valida se a cabeça está reta ou inclinada com base na posição dos olhos 
+    head_pose_validation = validate_head_straight(landmarks)
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # --- métricas atuais ---
@@ -103,7 +109,8 @@ async def analyze_image(file):
         face_validation["faceDetected"] and
         not face_validation["multipleFaces"] and
         position_validation["centered"] and
-        position_validation["faceSizeOk"]
+        position_validation["faceSizeOk"] and
+        head_pose_validation["headStraight"]
     )
 
     return {
@@ -114,5 +121,7 @@ async def analyze_image(file):
         "multipleFaces": face_validation["multipleFaces"],
         "centered": bool(position_validation["centered"]),
         "faceSizeOk": bool(position_validation["faceSizeOk"]),
+        "headStraight": head_pose_validation["headStraight"],
+        "eyeAlignmentDifference": head_pose_validation["eyeAlignmentDifference"],
         "approved": bool(approved)
     }
