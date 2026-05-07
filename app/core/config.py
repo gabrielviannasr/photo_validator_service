@@ -48,18 +48,18 @@ MAX_EYE_ALIGNMENT_DIFFERENCE = 0.05
 
 SHARPNESS_WEIGHT = 0.20
 BRIGHTNESS_WEIGHT = 0.15
-FACE_WEIGHT = 0.20
+FACE_WEIGHT = 0.25
 
 CENTER_WEIGHT = 0.15
 FACE_SIZE_WEIGHT = 0.05
-HEAD_POSE_WEIGHT = 0.10
+HEAD_POSE_WEIGHT = 0.20
 
 
 # ==========================================
 # FINAL VALIDATION
 # ==========================================
 
-VALIDATION_SCORE_THRESHOLD = 0.70
+VALIDATION_SCORE_THRESHOLD = 0.80
 
 # Limite máximo usado na normalização contínua
 MAX_NORMALIZED_SCORE = 1.0
