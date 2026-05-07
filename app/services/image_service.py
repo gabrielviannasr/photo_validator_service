@@ -7,6 +7,9 @@ from app.core.config import (
     FACE_SIZE_MIN_RATIO,
     FACE_SIZE_MAX_RATIO
 )
+from app.services.validators.face_landmarks_validator import (
+    detect_face_landmarks
+)
 
 def detect_faces(gray_image):
     face_cascade = cv2.CascadeClassifier(
@@ -78,6 +81,9 @@ async def analyze_image(file):
         return {
             "error": "Invalid image file"
         }
+    
+    # identifica pontos de referência facial (olhos, nariz, boca, etc.)
+    landmarks = detect_face_landmarks(img)
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -101,6 +107,7 @@ async def analyze_image(file):
     )
 
     return {
+        "landmarksDetected": landmarks is not None,
         "sharpness": float(sharpness),
         "brightness": float(brightness),
         "faceDetected": face_validation["faceDetected"],
