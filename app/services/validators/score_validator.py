@@ -1,4 +1,7 @@
 from app.core.config import (
+    FACE_CENTER_TOLERANCE_X,
+    FACE_CENTER_TOLERANCE_Y,
+
     MAX_SHARPNESS,
     IDEAL_BRIGHTNESS,
     MAX_BRIGHTNESS_DIFFERENCE,
@@ -56,12 +59,29 @@ def calculate_validation_score(
     score += FACE_WEIGHT
 
     # --- centralização ---
-    if position_validation["centered"]:
-        score += 0.15
+    center_distance = max(
+        position_validation["centerDistanceX"],
+        position_validation["centerDistanceY"]
+    )
+
+    center_score = (
+        max(0, 1 - (center_distance /  0.30)) * 0.15
+    )
+
+    score += center_score
 
     # --- tamanho do rosto ---
-    if position_validation["faceSizeOk"]:
-        score += 0.10
+    ideal_face_ratio = 0.65
+
+    face_ratio_difference = abs(
+        position_validation["faceRatio"] - ideal_face_ratio
+    )
+
+    face_size_score = (
+        max(0, 1 - (face_ratio_difference / 0.50)) * 0.10
+    )
+
+    score += face_size_score
 
     # --- alinhamento da cabeça contínuo ---
     eye_alignment_difference = (
@@ -69,16 +89,16 @@ def calculate_validation_score(
     )
 
     head_pose_score = (
-        max(
-            0,
-            1 - (
-                eye_alignment_difference
-                / MAX_EYE_ALIGNMENT_DIFFERENCE
-            )
-        )
-        * 0.10
+        max(0, 1 - (eye_alignment_difference / MAX_EYE_ALIGNMENT_DIFFERENCE)) * 0.10
     )
 
     score += head_pose_score
 
-    return round(min(score, 1.0), 2)
+    return {
+        "validationScore": round(min(score, 1.0), 2),
+        "sharpness_score": round(sharpness_score, 2),
+        "brightness_score": round(brightness_score, 2),
+        "center_score": round(center_score, 2),
+        "face_size_score": round(face_size_score, 2),
+        "head_pose_score": round(head_pose_score, 2)
+    }

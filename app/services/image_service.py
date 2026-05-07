@@ -72,7 +72,10 @@ def validate_face_position_and_size(faces, image_shape):
     face_size_ok = FACE_SIZE_MIN_RATIO <= face_ratio <= FACE_SIZE_MAX_RATIO
 
     return {
+        "centerDistanceX": float(abs(face_center_x - img_center_x) / img_w),
+        "centerDistanceY": float(abs(face_center_y - img_center_y) / img_h),
         "centered": bool(centered),
+        "faceRatio": float(face_ratio),
         "faceSizeOk": bool(face_size_ok)
     }
 
@@ -124,7 +127,7 @@ async def analyze_image(file):
     #     head_pose_validation["headStraight"]
     # )
 
-    approved = validation_score >= 0.80
+    approved = validation_score["validationScore"] >= 0.80
 
     return {
         "landmarksDetected": landmarks is not None,
@@ -136,6 +139,11 @@ async def analyze_image(file):
         "faceSizeOk": bool(position_validation["faceSizeOk"]),
         "headStraight": head_pose_validation["headStraight"],
         "eyeAlignmentDifference": head_pose_validation["eyeAlignmentDifference"],
-        "validationScore": float(validation_score),
+        "sharpnessScore": validation_score["sharpness_score"],
+        "brightnessScore": validation_score["brightness_score"],
+        "centerScore": validation_score["center_score"],
+        "faceSizeScore": validation_score["face_size_score"],
+        "headPoseScore": validation_score["head_pose_score"],
+        "validationScore": validation_score["validationScore"],
         "approved": bool(approved)
     }
