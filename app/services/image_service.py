@@ -17,6 +17,9 @@ from app.services.validators.head_pose_validator import (
 from app.services.validators.score_validator import (
     calculate_validation_score
 )
+from app.services.validators.eyes_validator import (
+    validate_eyes_visible
+)
 
 def detect_faces(gray_image):
     face_cascade = cv2.CascadeClassifier(
@@ -108,7 +111,11 @@ async def analyze_image(file):
     faces = detect_faces(gray)
     face_validation = validate_single_face(faces)
 
+    # --- NOVO: validação de posição e tamanho do rosto --- 
     position_validation = validate_face_position_and_size(faces, img.shape)
+
+    # --- NOVO: validação de olhos abertos ---
+    eyes_validation = validate_eyes_visible(landmarks)
 
     validation_score = calculate_validation_score(
         sharpness,
@@ -140,6 +147,8 @@ async def analyze_image(file):
         "faceSizeOk": bool(position_validation["faceSizeOk"]),
         "headStraight": head_pose_validation["headStraight"],
         "eyeAlignmentDifference": head_pose_validation["eyeAlignmentDifference"],
+        "eyesVisible": eyes_validation["eyesVisible"],
+        "eyeOpennessScore": eyes_validation["eyeOpennessScore"],
         "sharpnessScore": validation_score["sharpness_score"],
         "brightnessScore": validation_score["brightness_score"],
         "centerScore": validation_score["center_score"],
