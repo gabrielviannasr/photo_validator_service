@@ -122,7 +122,8 @@ async def analyze_image(file):
         brightness,
         face_validation,
         position_validation,
-        head_pose_validation
+        head_pose_validation,
+        eyes_validation
     )
 
     # approved = (

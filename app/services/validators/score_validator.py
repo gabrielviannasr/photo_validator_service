@@ -1,20 +1,20 @@
 from app.core.config import (
-    MAX_SHARPNESS,
     IDEAL_BRIGHTNESS,
     MAX_BRIGHTNESS_DIFFERENCE,
+    MAX_SHARPNESS,
     MAX_EYE_ALIGNMENT_DIFFERENCE,
 
-    SHARPNESS_WEIGHT,
     BRIGHTNESS_WEIGHT,
-    FACE_WEIGHT,
-
     CENTER_WEIGHT,
+    EYES_VISIBLE_WEIGHT,
+    FACE_WEIGHT,
     FACE_SIZE_WEIGHT,
     HEAD_POSE_WEIGHT,
+    SHARPNESS_WEIGHT,
 
     CENTER_SCORE_NORMALIZER,
-    IDEAL_FACE_RATIO,
     FACE_RATIO_NORMALIZER,
+    IDEAL_FACE_RATIO,
 
     MAX_NORMALIZED_SCORE
 )
@@ -24,7 +24,8 @@ def calculate_validation_score(
     brightness,
     face_validation,
     position_validation,
-    head_pose_validation
+    head_pose_validation,
+    eyes_validation
 ):
     # --- penalidades críticas ---
     if not face_validation["faceDetected"]:
@@ -124,6 +125,18 @@ def calculate_validation_score(
     )
 
     score += head_pose_score
+
+    eye_openness = eyes_validation["eyeOpennessScore"]
+
+    eye_score = (
+        min(
+            eye_openness / 0.03,
+            1.0
+        )
+        * EYES_VISIBLE_WEIGHT
+    )
+
+    score += eye_score
 
     return {
         "validationScore": round(min(score, 1.0), 2),
