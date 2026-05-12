@@ -53,7 +53,14 @@ FACE_WEIGHT = 0.15
 FACE_SIZE_WEIGHT = 0.05
 HEAD_POSE_WEIGHT = 0.20
 SHARPNESS_WEIGHT = 0.15
+YAW_WEIGHT = 0.0
 
+
+# ==========================================
+# YAW VALIDATION
+# ==========================================
+
+YAW_DIFFERENCE_THRESHOLD = 0.04
 
 # ==========================================
 # FINAL VALIDATION

@@ -20,6 +20,9 @@ from app.services.validators.score_validator import (
 from app.services.validators.eyes_validator import (
     validate_eyes_visible
 )
+from app.services.validators.yaw_validator import (
+    validate_face_yaw
+)
 
 def detect_faces(gray_image):
     face_cascade = cv2.CascadeClassifier(
@@ -98,6 +101,9 @@ async def analyze_image(file):
     # identifica pontos de referência facial (olhos, nariz, boca, etc.)
     landmarks = detect_face_landmarks(img)
 
+    # valida se a cabeça está inclinada para os lados (yaw) com base na posição dos olhos e nariz
+    yaw_validation = validate_face_yaw(landmarks)
+
     # valida se a cabeça está reta ou inclinada com base na posição dos olhos 
     head_pose_validation = validate_head_straight(landmarks)
 
@@ -140,21 +146,25 @@ async def analyze_image(file):
 
     return {
         "landmarksDetected": landmarks is not None,
-        "sharpness": float(sharpness),
         "brightness": float(brightness),
-        "faceDetected": face_validation["faceDetected"],
-        "multipleFaces": face_validation["multipleFaces"],
         "centered": bool(position_validation["centered"]),
-        "faceSizeOk": bool(position_validation["faceSizeOk"]),
-        "headStraight": head_pose_validation["headStraight"],
         "eyeAlignmentDifference": head_pose_validation["eyeAlignmentDifference"],
         "eyesVisible": eyes_validation["eyesVisible"],
+        "faceDetected": face_validation["faceDetected"],
+        "faceSizeOk": bool(position_validation["faceSizeOk"]),
+        "headStraight": head_pose_validation["headStraight"],
+        "multipleFaces": face_validation["multipleFaces"],
+        "sharpness": float(sharpness),
+        "yawOk": yaw_validation["yawOk"],
+        "yawDifference": yaw_validation["yawDifference"],
+
         "eyeOpennessScore": eyes_validation["eyeOpennessScore"],
-        "sharpnessScore": validation_score["sharpness_score"],
         "brightnessScore": validation_score["brightness_score"],
         "centerScore": validation_score["center_score"],
         "faceSizeScore": validation_score["face_size_score"],
         "headPoseScore": validation_score["head_pose_score"],
+        "sharpnessScore": validation_score["sharpness_score"],
+        "yawScore": yaw_validation["yawScore"],
         "validationScore": validation_score["validationScore"],
         "approved": bool(approved)
     }
