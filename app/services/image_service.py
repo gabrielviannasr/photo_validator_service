@@ -146,26 +146,33 @@ async def analyze_image(file):
     approved = validation_score["validationScore"] >= VALIDATION_SCORE_THRESHOLD
 
     return {
-        "landmarksDetected": landmarks is not None,
-        "brightness": float(brightness),
-        "centered": bool(position_validation["centered"]),
-        "eyeAlignmentDifference": head_pose_validation["eyeAlignmentDifference"],
-        "eyesVisible": eyes_validation["eyesVisible"],
-        "faceDetected": face_validation["faceDetected"],
-        "faceSizeOk": bool(position_validation["faceSizeOk"]),
-        "headStraight": head_pose_validation["headStraight"],
-        "multipleFaces": face_validation["multipleFaces"],
-        "sharpness": float(sharpness),
-        "yawOk": yaw_validation["yawOk"],
-        "yawDifference": yaw_validation["yawDifference"],
-
-        "brightnessScore": validation_score["brightness_score"],
-        "centerScore": validation_score["center_score"],
-        "faceSizeScore": validation_score["face_size_score"],
-        "eyeScore": validation_score["eye_score"],
-        "headPoseScore": validation_score["head_pose_score"],
-        "sharpnessScore": validation_score["sharpness_score"],
-        "yawScore": validation_score["yaw_score"],
+        "analysis": {
+            "eyeAlignmentDifference": head_pose_validation["eyeAlignmentDifference"],
+            "yawDifference": yaw_validation["yawDifference"],
+        },
+        "face": {
+            "centered": bool(position_validation["centered"]),
+            "faceDetected": bool(face_validation["faceDetected"]),
+            "faceSizeOk": bool(position_validation["faceSizeOk"]),
+            "landmarksDetected": landmarks is not None,
+            "multipleFaces": bool(face_validation["multipleFaces"]),
+            "headStraight": bool(head_pose_validation["headStraight"]),
+            "eyesVisible": bool(eyes_validation["eyesVisible"]),
+            "yawOk": bool(yaw_validation["yawOk"])
+        },
+        "metrics": {
+            "brightness": float(brightness),
+            "sharpness": float(sharpness)
+        },
+        "score": {
+            "brightnessScore": validation_score["brightness_score"],
+            "centerScore": validation_score["center_score"],
+            "faceSizeScore": validation_score["face_size_score"],
+            "eyeScore": validation_score["eye_score"],
+            "headPoseScore": validation_score["head_pose_score"],
+            "sharpnessScore": validation_score["sharpness_score"],
+            "yawScore": validation_score["yaw_score"],
+        },
         "validationScore": validation_score["validationScore"],
         "approved": bool(approved)
     }
