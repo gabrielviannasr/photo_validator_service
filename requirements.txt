@@ -1,6 +1,8 @@
 fastapi
+httpx
 mediapipe
 numpy
 opencv-python-headless
+pytest
 python-multipart
 uvicorn
