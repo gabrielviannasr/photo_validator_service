@@ -217,28 +217,6 @@ YAW_WEIGHT = 0.10
 
 ---
 
-# Rodando com Docker
-
-## Build
-
-```bash
-docker build -t photo-validation-service .
-```
-
-## Executar container
-
-```bash
-docker run -p 8000:8000 photo-validation-service
-```
-
-## Swagger
-
-```text
-http://localhost:8000/docs
-```
-
----
-
 # Rodando localmente
 
 ## Criar ambiente virtual
@@ -246,6 +224,8 @@ http://localhost:8000/docs
 ```bash
 python -m venv venv
 ```
+
+---
 
 ## Ativar ambiente virtual
 
@@ -264,6 +244,20 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ---
 
+## Atualizar pip
+
+```bash
+python -m pip install --upgrade pip
+```
+
+ou
+
+```bash
+pip install --upgrade pip
+```
+
+---
+
 ## Instalar dependências
 
 ```bash
@@ -272,8 +266,107 @@ pip install -r requirements.txt
 
 ---
 
+## Validar ambiente
+
+Verificar se as principais ferramentas foram instaladas corretamente:
+
+```bash
+python --version
+pip --version
+pytest --version
+uvicorn --version
+```
+
+---
+
+## Executar testes automatizados
+
+```bash
+pytest
+```
+
+---
+
 ## Executar projeto
 
 ```bash
 python -m uvicorn app.main:app --reload
+```
+
+---
+
+# Recriando o ambiente virtual
+
+Caso existam problemas com dependências, cache ou ambiente virtual corrompido:
+
+## Desativar ambiente virtual
+
+```bash
+deactivate
+```
+
+---
+
+## Remover ambiente virtual
+
+```powershell
+Remove-Item -Recurse -Force venv
+```
+
+---
+
+## Criar novo ambiente virtual
+
+```bash
+python -m venv venv
+```
+
+---
+
+## Ativar ambiente virtual
+
+```bash
+.\venv\Scripts\activate
+```
+
+---
+
+## Atualizar pip
+
+```bash
+python -m pip install --upgrade pip
+```
+
+---
+
+## Instalar dependências novamente
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Executar testes
+
+```bash
+pytest
+```
+
+---
+
+# Limpando cache do projeto
+
+## Remover cache Python
+
+```powershell
+Get-ChildItem -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force
+```
+
+---
+
+## Remover cache do pytest
+
+```powershell
+Remove-Item -Recurse -Force .pytest_cache
 ```
