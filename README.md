@@ -1,95 +1,279 @@
+# Photo Validation Service
+
+Microserviço de validação biométrica para fotos 3x4/documentais.
+
+O serviço analisa automaticamente a qualidade da imagem e valida critérios biométricos para verificar se a foto é adequada para identificação em documentos, carteiras de benefício, cadastro ou autenticação.
+
+---
+
+# Funcionalidades
+
+O serviço realiza validações automáticas de:
+
+- Nitidez da imagem
+- Brilho/iluminação
+- Detecção facial
+- Múltiplos rostos
+- Centralização do rosto
+- Proporção/tamanho do rosto
+- Inclinação vertical da cabeça (roll)
+- Rotação lateral da cabeça (yaw)
+- Visibilidade dos olhos
+- Detecção de landmarks faciais com MediaPipe
+- Score contínuo de validação biométrica
+
+---
+
+# Tecnologias utilizadas
+
+- Python 3.11
+- FastAPI
+- OpenCV
+- MediaPipe
+- Uvicorn
+- Docker
+
+---
+
+# Estrutura do projeto
+
+```text
 photo-validation-service/
 │
 ├── app/
-│   ├── main.py              # entrypoint da API
+│   ├── main.py
 │   ├── routes/
-│   │   └── validation.py    # endpoints
-│   │
 │   ├── services/
-│   │   └── image_service.py # lógica de validação
-│   │
 │   ├── core/
-│   │   └── config.py        # configs (env, constantes)
-│   │
 │   ├── models/
-│   │   └── response_model.py # modelos de resposta
-│   │
 │   └── utils/
-│       └── image_utils.py   # funções auxiliares (opcional)
 │
 ├── tests/
-│   └── test_validation.py
-│
 ├── requirements.txt
 ├── Dockerfile
-├── .env
 ├── .gitignore
 └── README.md
-
-
-🐳 1. Rodando com Docker (usando seu Dockerfile)
-
-Dentro da pasta photo-validation-service:
-
-📦 Build da imagem
 ```
+
+---
+
+# Como funciona a validação
+
+O sistema gera um score contínuo entre `0.0` e `1.0`.
+
+A foto é aprovada quando:
+
+```python
+validationScore >= 0.80
+```
+
+Cada critério contribui com um peso específico no score final.
+
+---
+
+# Critérios avaliados
+
+| Critério | Descrição |
+|---|---|
+| Sharpness | Verifica nitidez da imagem |
+| Brightness | Avalia iluminação |
+| Face Detection | Detecta presença facial |
+| Multiple Faces | Reprova múltiplos rostos |
+| Center Position | Verifica centralização |
+| Face Size | Valida proporção do rosto |
+| Head Pose | Detecta inclinação da cabeça |
+| Eyes Visible | Verifica visibilidade dos olhos |
+| Yaw Validation | Detecta rotação lateral |
+
+---
+
+# Configuração
+
+As regras do sistema podem ser ajustadas em:
+
+```text
+app/core/config.py
+```
+
+---
+
+# Principais configurações
+
+## Centralização do rosto
+
+```python
+FACE_CENTER_TOLERANCE_X = 0.15
+FACE_CENTER_TOLERANCE_Y = 0.15
+```
+
+Define a tolerância permitida para deslocamento do rosto.
+
+---
+
+## Tamanho do rosto
+
+```python
+FACE_SIZE_MIN_RATIO = 0.50
+FACE_SIZE_MAX_RATIO = 0.85
+```
+
+Define a faixa aceitável da proporção do rosto em relação à imagem.
+
+---
+
+## Qualidade da imagem
+
+```python
+IDEAL_BRIGHTNESS = 140
+MAX_SHARPNESS = 500
+```
+
+Define parâmetros ideais de iluminação e nitidez.
+
+---
+
+## Pose da cabeça
+
+```python
+MAX_EYE_ALIGNMENT_DIFFERENCE = 0.05
+```
+
+Define tolerância para inclinação da cabeça.
+
+---
+
+## Validação lateral (Yaw)
+
+```python
+YAW_DIFFERENCE_THRESHOLD = 0.04
+```
+
+Controla a tolerância de rotação lateral da cabeça.
+
+---
+
+## Threshold de aprovação
+
+```python
+VALIDATION_SCORE_THRESHOLD = 0.80
+```
+
+Nota mínima necessária para aprovação.
+
+---
+
+# Score weights
+
+Os pesos abaixo definem a influência de cada critério no score final:
+
+```python
+BRIGHTNESS_WEIGHT = 0.10
+CENTER_WEIGHT = 0.10
+EYES_VISIBLE_WEIGHT = 0.15
+FACE_WEIGHT = 0.15
+FACE_SIZE_WEIGHT = 0.05
+HEAD_POSE_WEIGHT = 0.20
+SHARPNESS_WEIGHT = 0.15
+YAW_WEIGHT = 0.10
+```
+
+---
+
+# Exemplo de resposta
+
+```json
+{
+  "analysis": {
+    "eyeAlignmentDifference": 0.0023,
+    "yawDifference": 0.0015
+  },
+  "face": {
+    "centered": true,
+    "faceDetected": true,
+    "faceSizeOk": false,
+    "landmarksDetected": true,
+    "multipleFaces": false,
+    "headStraight": true,
+    "eyesVisible": true,
+    "yawOk": true
+  },
+  "metrics": {
+    "brightness": 204.81,
+    "sharpness": 806.49
+  },
+  "score": {
+    "brightnessScore": 0.05,
+    "centerScore": 0.08,
+    "faceSizeScore": 0.03,
+    "eyeScore": 0.10,
+    "headPoseScore": 0.19,
+    "sharpnessScore": 0.15,
+    "yawScore": 0.10
+  },
+  "validationScore": 0.85,
+  "approved": true
+}
+```
+
+---
+
+# Rodando com Docker
+
+## Build
+
+```bash
 docker build -t photo-validation-service .
 ```
 
-▶️ Rodar o container
-```
+## Executar container
+
+```bash
 docker run -p 8000:8000 photo-validation-service
 ```
 
-🌐 Testar
-```
+## Swagger
+
+```text
 http://localhost:8000/docs
 ```
 
-🔥 2. Rodando sem Docker (só pra teste rápido)
+---
 
-```
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
+# Rodando localmente
 
-✅ 1. Cria um ambiente virtual (evita quebrar o sistema)
+## Criar ambiente virtual
 
-Dentro do projeto:
-
-```
+```bash
 python -m venv venv
 ```
 
-✅ 2. Ativa o ambiente
+## Ativar ambiente virtual
 
-No PowerShell:
+### Windows PowerShell
 
-```
+```bash
 .\venv\Scripts\activate
 ```
 
-Se der erro de permissão:
+Se necessário:
 
-```
+```bash
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\venv\Scripts\activate
 ```
 
-✅ 3. Atualiza o pip (importante)
+---
 
-```
-python -m pip install --upgrade pip
-```
+## Instalar dependências
 
-✅ 4. Instala dependências
-
-```
+```bash
 pip install -r requirements.txt
 ```
 
-✅ 5. Rodar o projeto
+---
 
-```
+## Executar projeto
+
+```bash
 python -m uvicorn app.main:app --reload
 ```
