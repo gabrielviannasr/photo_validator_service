@@ -162,7 +162,7 @@ async def analyze_image(file):
         "brightnessScore": validation_score["brightness_score"],
         "centerScore": validation_score["center_score"],
         "faceSizeScore": validation_score["face_size_score"],
-        "eyeOpennessScore": eyes_validation["eyeOpennessScore"],
+        "eyeScore": validation_score["eye_score"],
         "headPoseScore": validation_score["head_pose_score"],
         "sharpnessScore": validation_score["sharpness_score"],
         "yawScore": validation_score["yaw_score"],

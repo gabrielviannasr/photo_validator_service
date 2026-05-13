@@ -148,6 +148,7 @@ def calculate_validation_score(
     return {        
         "brightness_score": round(brightness_score, 2),
         "center_score": round(center_score, 2),
+        "eye_score": round(eye_score, 2),
         "face_size_score": round(face_size_score, 2),
         "head_pose_score": round(head_pose_score, 2),
         "sharpness_score": round(sharpness_score, 2),
