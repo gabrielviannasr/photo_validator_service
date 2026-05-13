@@ -11,6 +11,7 @@ from app.core.config import (
     FACE_SIZE_WEIGHT,
     HEAD_POSE_WEIGHT,
     SHARPNESS_WEIGHT,
+    YAW_WEIGHT,
 
     CENTER_SCORE_NORMALIZER,
     FACE_RATIO_NORMALIZER,
@@ -25,7 +26,8 @@ def calculate_validation_score(
     face_validation,
     position_validation,
     head_pose_validation,
-    eyes_validation
+    eyes_validation,
+    yaw_validation
 ):
     # --- penalidades críticas ---
     if not face_validation["faceDetected"]:
@@ -138,11 +140,17 @@ def calculate_validation_score(
 
     score += eye_score
 
-    return {
-        "validationScore": round(min(score, 1.0), 2),
-        "sharpness_score": round(sharpness_score, 2),
+    # --- yaw contínuo ---
+    yaw_score = yaw_validation["yawScore"] * YAW_WEIGHT
+
+    score += yaw_score
+
+    return {        
         "brightness_score": round(brightness_score, 2),
         "center_score": round(center_score, 2),
         "face_size_score": round(face_size_score, 2),
-        "head_pose_score": round(head_pose_score, 2)
+        "head_pose_score": round(head_pose_score, 2),
+        "sharpness_score": round(sharpness_score, 2),
+        "validationScore": round(min(score, 1.0), 2),
+        "yaw_score": round(yaw_score, 2)
     }

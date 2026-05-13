@@ -129,7 +129,8 @@ async def analyze_image(file):
         face_validation,
         position_validation,
         head_pose_validation,
-        eyes_validation
+        eyes_validation,
+        yaw_validation
     )
 
     # approved = (
@@ -158,13 +159,13 @@ async def analyze_image(file):
         "yawOk": yaw_validation["yawOk"],
         "yawDifference": yaw_validation["yawDifference"],
 
-        "eyeOpennessScore": eyes_validation["eyeOpennessScore"],
         "brightnessScore": validation_score["brightness_score"],
         "centerScore": validation_score["center_score"],
         "faceSizeScore": validation_score["face_size_score"],
+        "eyeOpennessScore": eyes_validation["eyeOpennessScore"],
         "headPoseScore": validation_score["head_pose_score"],
         "sharpnessScore": validation_score["sharpness_score"],
-        "yawScore": yaw_validation["yawScore"],
+        "yawScore": validation_score["yaw_score"],
         "validationScore": validation_score["validationScore"],
         "approved": bool(approved)
     }
