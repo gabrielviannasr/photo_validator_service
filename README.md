@@ -217,6 +217,28 @@ YAW_WEIGHT = 0.10
 
 ---
 
+# Rodando com Docker
+
+## Build
+
+```bash
+docker build -t photo-validator-api .
+```
+
+## Executar container
+
+```bash
+docker run -p 8080:8080 photo-validator-api
+```
+
+## Swagger
+
+```text
+http://localhost:8080/docs
+```
+
+---
+
 # Rodando localmente
 
 ## Criar ambiente virtual
